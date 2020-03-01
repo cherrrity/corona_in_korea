@@ -1,4 +1,3 @@
-**
 
 ## 대한민국 내 코로나-19 확진자 정보 크롤러 (json)
 
@@ -31,7 +30,7 @@
 
 
 
-(참조 사이트)
+(참조 사이트)  
 서울 : http://www.seoul.go.kr/coronaV/coronaStatus.do  
 부산 : http://www.busan.go.kr/corona/index.jsp  
 충남 : http://www.chungnam.go.kr/coronaStatus.do  
