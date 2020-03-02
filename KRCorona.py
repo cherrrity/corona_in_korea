@@ -14,21 +14,23 @@ from requests import get
 생년
 상세지역
 """
-seoul_html = 'http://www.seoul.go.kr/coronaV/coronaStatus.do'
-gyeonggi_html = 'https://www.gg.go.kr/bbs/boardView.do?bsIdx=464&bIdx=2296956&menuId=1535'
-busan_html = 'http://www.busan.go.kr/corona/index.jsp'
-chungnam_html = 'http://www.chungnam.go.kr/coronaStatus.do'
-gyeongnam_html = 'http://www.gyeongnam.go.kr/corona.html'
+seoul_url = 'http://www.seoul.go.kr/coronaV/coronaStatus.do'
+gyeonggi_url = 'https://www.gg.go.kr/bbs/boardView.do?bsIdx=464&bIdx=2296956&menuId=1535'
+busan_url = 'http://www.busan.go.kr/corona/index.jsp'
+chungnam_url = 'http://www.chungnam.go.kr/coronaStatus.do'
+gyeongnam_url = 'http://www.gyeongnam.go.kr/corona.html'
 
 def gyeongnam():
     gyeongnam_json = OrderedDict()
+    gyeongnam_array = []
     
-    html = requests.get(gyeongnam_html)
+    html = requests.get(gyeongnam_url)
     html.encoding = "utf-8"
     soup = BeautifulSoup(html.text, 'html.parser')
     datas = soup.select('#patients > tbody > tr.patient')
 
     cnt = len(datas)
+    gyeongnam_json["total"] = cnt
 
     date = ''
     sex = ''
@@ -64,24 +66,26 @@ def gyeongnam():
             dump["확진일"] = date
             dump["성별"] = sex
             dump["생년"] = birth
+            dump["지역"] = "경상남도"
             dump["상세지역"] = area
        
-        sorted(dump.keys())        
-        gyeongnam_json[str(cnt)] = dump
-        cnt = cnt - 1
+        gyeongnam_array.append(dump)
  
+    gyeongnam_json["patient"] = gyeongnam_array
     print("경상남도 완료..")
     return gyeongnam_json
 
 
 def chungnam():
     chungnam_json = OrderedDict()
+    chungnam_array = []
     
-    html = requests.get(chungnam_html).text
+    html = requests.get(chungnam_url).text
     soup = BeautifulSoup(html, 'html.parser')
     datas = soup.select('div.multiTabContents > div > div > ul > li.tabContents.active > table > tbody > tr:not(.detail)')
 
     cnt = len(datas)
+    chungnam_json["total"] = cnt
 
     date = ''
     sex = ''
@@ -114,26 +118,27 @@ def chungnam():
                     dump["확진일"] = date
                     dump["성별"] = sex
                     dump["생년"] = birth
+                    dump["지역"] = "충청남도"
                     dump["상세지역"] = area
                     
-        sorted(dump.keys())        
-        chungnam_json[str(cnt)] = dump
-        cnt = cnt - 1
+        chungnam_array.append(dump)
  
+    chungnam_json["patient"] = chungnam_array
     print("충청남도 완료..")
     return chungnam_json
 
 
 def busan():
     busan_json = OrderedDict()
+    busan_array = []
     
-    html = requests.get(busan_html).text
+    html = requests.get(busan_url).text
     soup = BeautifulSoup(html, 'html.parser')
     datas = soup.select('#contents > div > div.list_body > ul > li:first-child')
 
     cnt = len(datas)
+    busan_json["total"] = cnt
 
-    
     
     for data in datas:
         dump = OrderedDict()
@@ -142,15 +147,15 @@ def busan():
             
             dump["확진일"] = ''
             dump["성별"] = d[1].strip()
-            
-            dump["생년"] = int(d[0].strip()[:-2])
 
+            dump["생년"] = int(d[0].strip()[:-2])
+            dump["지역"] = "부산"
             dump["상세지역"] = d[2].strip()[:-1]
 
-        sorted(dump.keys())  
-        busan_json[str(cnt)] = dump
-        cnt = cnt - 1
+        
+        busan_array.append(dump)
  
+    busan_json["patient"] = busan_array
     print("부산 완료..")
     return busan_json
 
@@ -160,13 +165,16 @@ def gyeonggi():
     연번, 확진자 번호, 성별, 출생연도, 확진일자, 퇴원일자, 상세지역
     """
     gyeonggi_json = OrderedDict()
+    gyeonggi_array = []
     
-    html = requests.get(gyeonggi_html).text
+    html = requests.get(gyeonggi_url).text
     soup = BeautifulSoup(html, 'html.parser')
     datas = soup.select('#quick3 > div > div:nth-child(3) > div > div > table > tbody > tr')
 
     
     cnt = len(datas)
+    gyeonggi_json["total"] = cnt
+    
 
     date = ''
     sex = ''
@@ -174,8 +182,10 @@ def gyeonggi():
     area = ''
 
     for data in datas:
+        
         data = data.text.strip().split('\n')
         dump = OrderedDict()
+        
         for da, i in zip(data, range(0, len(data))):
             if( i == 4):
                 day = da[2:]
@@ -199,23 +209,26 @@ def gyeonggi():
             dump["확진일"] = date
             dump["성별"] = sex
             dump["생년"] = birth
+            dump["지역"] = "경기도"
             dump["상세지역"] = area
-            
-        sorted(dump.keys())  
-        gyeonggi_json[str(cnt)] = dump
-        cnt = cnt - 1
+
+        gyeonggi_array.append(dump)
         
+    gyeonggi_json["patient"] = gyeonggi_array
     print("경기도 완료..")
     return gyeonggi_json
 
+
 def seoul():
     seoul_json = OrderedDict()
+    seoul_array = []
     
-    html = requests.get(seoul_html).text
+    html = requests.get(seoul_url).text
     soup = BeautifulSoup(html, 'html.parser')
     datas = soup.select('#move-cont1 > div:nth-child(2) > table > tbody > tr')
 
     cnt = len(datas)
+    seoul_json["total"] = cnt
     
     for data in datas:
         dump = OrderedDict()
@@ -230,14 +243,14 @@ def seoul():
                 else:
                     dump["생년"] = int('20'+da.text[3:5])
             elif( i == 4):
+                dump["지역"] = "서울"
                 dump["상세지역"] = da.text
                 if(da.text == '\xa0'):
                     dump["상세지역"] = "null"
                     
-        sorted(dump.keys())  
-        seoul_json[str(cnt)] = dump
-        cnt = cnt - 1
+        seoul_array.append(dump)
 
+    seoul_json["patient"] = seoul_array
     print("서울 완료..")
     return seoul_json
 
@@ -255,6 +268,8 @@ def main():
     total_json["busan"] = busan()
     total_json["chungnam"] = chungnam()
     total_json["gyeongnam"] = gyeongnam()
+
+
     
     #print test
     #print(json.dumps(total_json, ensure_ascii=False, indent="\t") )
