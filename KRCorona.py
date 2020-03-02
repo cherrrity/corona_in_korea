@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import json
 from collections import OrderedDict
 from datetime import datetime
-
+from requests import get
 
 """
 확진일자
@@ -18,6 +18,61 @@ seoul_html = 'http://www.seoul.go.kr/coronaV/coronaStatus.do'
 gyeonggi_html = 'https://www.gg.go.kr/bbs/boardView.do?bsIdx=464&bIdx=2296956&menuId=1535'
 busan_html = 'http://www.busan.go.kr/corona/index.jsp'
 chungnam_html = 'http://www.chungnam.go.kr/coronaStatus.do'
+gyeongnam_html = 'http://www.gyeongnam.go.kr/corona.html'
+
+def gyeongnam():
+    gyeongnam_json = OrderedDict()
+    
+    html = requests.get(gyeongnam_html)
+    html.encoding = "utf-8"
+    soup = BeautifulSoup(html.text, 'html.parser')
+    datas = soup.select('#patients > tbody > tr.patient')
+
+    cnt = len(datas)
+
+    date = ''
+    sex = ''
+    birth = 0
+    area = ''
+
+    for data in datas:
+        data = data.text.strip().split('\n')
+        dump = OrderedDict()
+        
+        if(len(data[2]) >= 32):
+            del data[2]
+            
+        for da,i in zip(data, range(0, len(data))):
+            if(i == 4):
+                date = da.split("/")
+                month = date[0]
+                day = date[1]
+                if(len(day) < 2):
+                    day = "0"+day
+                date = "2020.0"+month+"."+day
+                    
+            elif(i == 2):
+                d = da.split(',')
+                area = d[0].strip()
+                sex = d[1].strip()
+                birth = int(d[2].strip()[:1])
+                if( birth > 20):
+                    birth = 1900 + birth
+                else:
+                    birth = 2000 + birth
+
+            dump["확진일"] = date
+            dump["성별"] = sex
+            dump["생년"] = birth
+            dump["상세지역"] = area
+       
+        sorted(dump.keys())        
+        gyeongnam_json[str(cnt)] = dump
+        cnt = cnt - 1
+ 
+    print("경상남도 완료..")
+    return gyeongnam_json
+
 
 def chungnam():
     chungnam_json = OrderedDict()
@@ -83,15 +138,12 @@ def busan():
     for data in datas:
         dump = OrderedDict()
         for da in data:
-            d = da.text.split('\'',1)[1].split('/')
+            d = da.text.split('(',1)[1].split('/')
             
             dump["확진일"] = ''
             dump["성별"] = d[1].strip()
             
-            if(int(d[0][:2]) > 20):
-                dump["생년"] = int('19'+d[0].strip()[:2])
-            else:
-                dump["생년"] = int('20'+d[0].strip()[:2])
+            dump["생년"] = int(d[0].strip()[:-2])
 
             dump["상세지역"] = d[2].strip()[:-1]
 
@@ -195,13 +247,14 @@ def seoul():
 def main():
     total_json = OrderedDict()
     total_json["updated"] = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
-    total_json["area"] = ["seoul", "gyeonggi" , "busan", "chungnam"]
+    total_json["area"] = ["seoul", "gyeonggi" , "busan", "chungnam","gyeongnam"]
     
     #각 지역의 확진자 정보를 리턴받아 저장
     total_json["seoul"] = seoul()
     total_json["gyeonggi"] = gyeonggi()
     total_json["busan"] = busan()
     total_json["chungnam"] = chungnam()
+    total_json["gyeongnam"] = gyeongnam()
     
     #print test
     #print(json.dumps(total_json, ensure_ascii=False, indent="\t") )

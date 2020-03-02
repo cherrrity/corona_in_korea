@@ -40,6 +40,7 @@
 서울 : http://www.seoul.go.kr/coronaV/coronaStatus.do  
 경기도 : https://www.gg.go.kr/bbs/boardView.do?bsIdx=464&bIdx=2296956&menuId=1535  
 부산 : http://www.busan.go.kr/corona/index.jsp  
-충남 : http://www.chungnam.go.kr/coronaStatus.do  
+충청남도 : http://www.chungnam.go.kr/coronaStatus.do  
+경상남도 : http://www.gyeongnam.go.kr/corona.html  
 
 *타 지역 순차적 업데이트 중
