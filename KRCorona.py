@@ -78,6 +78,8 @@ def busan():
     datas = soup.select('#contents > div > div.list_body > ul > li:first-child')
 
     cnt = len(datas)
+
+    
     
     for data in datas:
         dump = OrderedDict()
@@ -103,6 +105,9 @@ def busan():
 
 
 def gyeonggi():
+    """
+    연번, 확진자 번호, 성별, 출생연도, 확진일자, 퇴원일자, 상세지역
+    """
     gyeonggi_json = OrderedDict()
     
     html = requests.get(gyeonggi_html).text
@@ -111,23 +116,47 @@ def gyeonggi():
 
     
     cnt = len(datas)
-    print(cnt)
 
+    date = ''
+    sex = ''
+    birth = 0
+    area = ''
 
-    print(datas)
-    j = 1
-    """
     for data in datas:
-        for da in data:
-    
+        data = data.text.strip().split('\n')
+        dump = OrderedDict()
+        for da, i in zip(data, range(0, len(data))):
+            if( i == 4):
+                day = da[2:]
+                if(len(day) < 2):
+                    day = "0"+day
+                date = '2020.0' + da[:1] +"."+ day
+                
+            elif( i == 2):
+                sex = da
+            elif( i == 3 ):
+                birth = int(da[1:])
+                if( birth > 20):
+                    birth = 1900 + birth
+                else:
+                    birth = 2000 + birth
+            elif( i == 6):
+                area = da;
+                if(da == '\xa0'):
+                    area = "null"
 
-    """
-
+            dump["확진일"] = date
+            dump["성별"] = sex
+            dump["생년"] = birth
+            dump["상세지역"] = area
+            
+        sorted(dump.keys())  
+        gyeonggi_json[str(cnt)] = dump
+        cnt = cnt - 1
+        
     print("gyeonggi is done..")
     return gyeonggi_json
 
-    
-    
 def seoul():
     seoul_json = OrderedDict()
     
@@ -171,10 +200,13 @@ def main():
 
     #각 지역의 확진자 정보를 리턴받아 저장
     total_json["seoul"] = seoul()
-    #total_json["gyeonggi"] = gyeonggi()
+    total_json["gyeonggi"] = gyeonggi()
     total_json["busan"] = busan()
     total_json["chungnam"] = chungnam()
-
+    
+    #print test
+    #print(json.dumps(total_json, ensure_ascii=False, indent="\t") )
+    
     #파일 생성
     with open('corona_in_korea.json','w', encoding="utf-8") as make_file:
         json.dump(total_json, make_file, ensure_ascii=False, indent="\t") 
