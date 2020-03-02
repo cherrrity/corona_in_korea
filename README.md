@@ -4,6 +4,12 @@
 예시)
 
 	"updated": "2020-03-02 02:19:45",
+	"area": [
+		"seoul",
+		"gyeonggi",
+		"busan",
+		"chungnam"
+	],
 	"seoul": {
 		"86": {
 			"확진일": "2020.2.29",
@@ -32,6 +38,7 @@
 
 (참조 사이트)  
 서울 : http://www.seoul.go.kr/coronaV/coronaStatus.do  
+경기도 : https://www.gg.go.kr/bbs/boardView.do?bsIdx=464&bIdx=2296956&menuId=1535  
 부산 : http://www.busan.go.kr/corona/index.jsp  
 충남 : http://www.chungnam.go.kr/coronaStatus.do  
 

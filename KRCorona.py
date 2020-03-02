@@ -17,7 +17,6 @@ from datetime import datetime
 seoul_html = 'http://www.seoul.go.kr/coronaV/coronaStatus.do'
 gyeonggi_html = 'https://www.gg.go.kr/bbs/boardView.do?bsIdx=464&bIdx=2296956&menuId=1535'
 busan_html = 'http://www.busan.go.kr/corona/index.jsp'
-
 chungnam_html = 'http://www.chungnam.go.kr/coronaStatus.do'
 
 def chungnam():
@@ -66,7 +65,7 @@ def chungnam():
         chungnam_json[str(cnt)] = dump
         cnt = cnt - 1
  
-    print("chungnam is done..")
+    print("충청남도 완료..")
     return chungnam_json
 
 
@@ -100,7 +99,7 @@ def busan():
         busan_json[str(cnt)] = dump
         cnt = cnt - 1
  
-    print("busan is done..")
+    print("부산 완료..")
     return busan_json
 
 
@@ -154,7 +153,7 @@ def gyeonggi():
         gyeonggi_json[str(cnt)] = dump
         cnt = cnt - 1
         
-    print("gyeonggi is done..")
+    print("경기도 완료..")
     return gyeonggi_json
 
 def seoul():
@@ -187,7 +186,7 @@ def seoul():
         seoul_json[str(cnt)] = dump
         cnt = cnt - 1
 
-    print("seoul is done..")
+    print("서울 완료..")
     return seoul_json
 
 
@@ -196,8 +195,8 @@ def seoul():
 def main():
     total_json = OrderedDict()
     total_json["updated"] = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
-
-
+    total_json["area"] = ["seoul", "gyeonggi" , "busan", "chungnam"]
+    
     #각 지역의 확진자 정보를 리턴받아 저장
     total_json["seoul"] = seoul()
     total_json["gyeonggi"] = gyeonggi()
