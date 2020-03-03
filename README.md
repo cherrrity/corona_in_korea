@@ -50,6 +50,17 @@
 경기도 : https://www.gg.go.kr/bbs/boardView.do?bsIdx=464&bIdx=2296956&menuId=1535  
 부산 : http://www.busan.go.kr/corona/index.jsp  
 충청남도 : http://www.chungnam.go.kr/coronaStatus.do  
-경상남도 : http://www.gyeongnam.go.kr/corona.html  
+경상남도 : http://www.gyeongnam.go.kr/corona.html   
+울산 : 'http://www.ulsan.go.kr/corona.jsp'  
+
+(강원도)
+춘천 : 'https://www.chuncheon.go.kr/index.chuncheon?menuCd=DOM_000000599001000000'  
+원주 : 'https://www.wonju.go.kr/intro.jsp'  
+강릉 : 'https://www.gn.go.kr/'  
+속초 : 'http://www.sokcho.go.kr/portal/openinfo/sokchonews/corona19news'  
+삼척 : 'http://www.samcheok.go.kr/02179/02696.web'  
+
+제주 : 'https://jeju.go.kr/api/article.jsp?board=corona_copper'  
+
 
 *타 지역 순차적 업데이트 중
