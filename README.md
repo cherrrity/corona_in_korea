@@ -53,7 +53,7 @@
 경상남도 : http://www.gyeongnam.go.kr/corona.html   
 울산 : 'http://www.ulsan.go.kr/corona.jsp'  
 
-(강원도)
+(강원도)  
 춘천 : 'https://www.chuncheon.go.kr/index.chuncheon?menuCd=DOM_000000599001000000'  
 원주 : 'https://www.wonju.go.kr/intro.jsp'  
 강릉 : 'https://www.gn.go.kr/'  
