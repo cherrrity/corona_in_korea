@@ -592,7 +592,7 @@ def busan():
 
     html = requests.get(busan_url).text
     soup = BeautifulSoup(html, 'html.parser')
-    datas = soup.select('#contents > div > div.list_body > ul > li:first-child')
+    datas = soup.select('#contents > div:nth-child(1) > div > div.list_body > ul > li:first-child')
 
     cnt = len(datas)
     busan_json["total"] = cnt
@@ -603,7 +603,7 @@ def busan():
         for da in data:
             d = da.text.split('(',1)[1].split('/')
 
-            dump["확진일"] = ''
+            dump["확진일"] = 'null'
             dump["성별"] = d[1].strip()
 
             dump["생년"] = int(d[0].strip()[:-2])
@@ -725,6 +725,7 @@ def main():
     total_json["area"] = ["seoul", "gyeonggi" , "busan", "chungnam","gyeongnam","ulsan","gangwon","jeju","daejeon","incheon","gwangju"]
 
     #각 지역의 확진자 정보를 리턴받아 저장
+    
     total_json["seoul"] = seoul() #서울
     total_json["gyeonggi"] = gyeonggi() #경기
     total_json["busan"] = busan() #부산
@@ -737,11 +738,11 @@ def main():
     total_json["incheon"] = incheon() # 인천
     total_json["gwangju"] = gwangju() # 광주
     
+    
     #print test
     #print(json.dumps(total_json, ensure_ascii=False, indent="\t") )
 
     #파일 생성
-    
     with open('corona_in_korea.json','w', encoding="utf-8") as make_file:
         json.dump(total_json, make_file, ensure_ascii=False, indent="\t")
     
