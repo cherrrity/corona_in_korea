@@ -36,9 +36,126 @@ sokcho_url = 'http://www.sokcho.go.kr/portal/openinfo/sokchonews/corona19news' #
 
 #제주
 jeju_url = 'https://jeju.go.kr/api/article.jsp?board=corona_copper'
-
 #대전
 daejeon_url = 'https://www.daejeon.go.kr/corona19/index.do?tab=2&subTab=2'
+#인천
+incheon_url = 'https://www.incheon.go.kr/health/HE020409'
+#전남광주
+gwangju_url = 'https://www.gwangju.go.kr/'
+
+def gwangju():
+    gwangju_json = OrderedDict()
+    gwangju_array = []
+
+
+    html = requests.get(gwangju_url)
+    html.encoding = "utf-8"
+    soup = BeautifulSoup(html.text, 'html.parser')
+    datas = soup.select('body > table > tbody > tr:nth-child(odd)')
+
+    cnt = len(datas)
+    gwangju_json["total"] = cnt
+
+    date = ''
+    sex = ''
+    birth = 0
+    area = ''
+
+    for data in datas:
+        data = data.text.strip().split('\n')
+        dump = OrderedDict()
+
+        if(data[3] != "-"):
+            date = data[3].split(" ")
+            month = date[0].replace("월","")
+            day = date[1].replace("일","")
+        
+            if(len(day) < 2):
+                day = "0"+day
+            
+            date = "2020.0"+month+"."+day
+        else:
+            date = "null"
+
+        da = data[1].split(',')
+        
+        sex = da[0][-1]
+        birth = 2020 - int(da[1].replace(' ', '')[:2])
+
+        dump["확진일"] = date
+        dump["성별"] = sex
+        dump["생년"] = birth
+        dump["지역"] = "광주광역시"
+        dump["상세지역"] = "null"
+
+        gwangju_array.append(dump)
+
+    gwangju_json["patient"] = gwangju_array
+    print("광주광역시 완료..")
+    return gwangju_json
+
+def incheon():
+    incheon_json = OrderedDict()
+    incheon_array = []
+
+    html = requests.get(incheon_url).text
+    soup = BeautifulSoup(html, 'html.parser')
+    datas = soup.select('#content > div.content-body > div > article > div > div:nth-child(5) .tbl > table > tbody > tr:nth-child(n+2)')
+
+    cnt = len(datas)
+    incheon_json["total"] = cnt
+
+    date = ''
+    sex = ''
+    birth = 0
+    area = ''
+
+    for data in datas:
+        dump = OrderedDict()
+        
+        for da, i in zip(data, range(0, len(data))):
+            da = da.text.replace(' ','')
+            if( i == 2):
+                d = da.split('/')
+                
+                #성별
+                sex = d[0]
+
+                #생년
+                if(len(d[1]) > 2):
+                    birth = 2020 - int(d[1][0:2])
+
+                else:
+                    birth = 2020 - int(d[1][0:1])
+                    
+                
+            elif( i == 3):
+                if(len(da.replace(' ', '')) > 3):
+                    date = da.split('(')
+                    date = date[0].split('.')
+                    month = date[1]
+                    day = date[2]
+                    
+                    if(len(day) < 2):
+                        day = "0"+day
+                        
+                    date = "2020.0"+month+"."+day
+
+        #상세지역
+        area = "null"
+
+        dump["확진일"] = date
+        dump["성별"] = sex
+        dump["생년"] = birth
+        dump["지역"] = "인천"
+        dump["상세지역"] = "null"
+
+        incheon_array.append(dump)
+        
+    incheon_json["patient"] = incheon_array
+    print("인천 완료..")
+    return incheon_json
+
 
 def daejeon():
     daejeon_json = OrderedDict()
@@ -605,7 +722,7 @@ def seoul():
 def main():
     total_json = OrderedDict()
     total_json["updated"] = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
-    total_json["area"] = ["seoul", "gyeonggi" , "busan", "chungnam","gyeongnam","ulsan","gangwon","jeju","daejeon"]
+    total_json["area"] = ["seoul", "gyeonggi" , "busan", "chungnam","gyeongnam","ulsan","gangwon","jeju","daejeon","incheon","gwangju"]
 
     #각 지역의 확진자 정보를 리턴받아 저장
     total_json["seoul"] = seoul() #서울
@@ -617,14 +734,17 @@ def main():
     total_json["gangwon"] = gangwon() # 강원
     total_json["jeju"] = jeju() # 제주
     total_json["daejeon"] = daejeon() # 대전
-
+    total_json["incheon"] = incheon() # 인천
+    total_json["gwangju"] = gwangju() # 광주
+    
     #print test
     #print(json.dumps(total_json, ensure_ascii=False, indent="\t") )
 
     #파일 생성
+    
     with open('corona_in_korea.json','w', encoding="utf-8") as make_file:
         json.dump(total_json, make_file, ensure_ascii=False, indent="\t")
-
+    
 
     print("파일생성 완료...")
 

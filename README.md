@@ -64,5 +64,7 @@ https://github.com/cherrrity/corona_in_korea/blob/master/corona_in_korea.json
 
 제주 : https://jeju.go.kr/api/article.jsp?board=corona_copper  
 대전 : https://www.daejeon.go.kr/corona19/index.do?tab=2&subTab=2  
+인천 : https://www.incheon.go.kr/health/HE020409  
+전남광주 : https://www.gwangju.go.kr/  
 
 *타 지역 순차적 업데이트 중
