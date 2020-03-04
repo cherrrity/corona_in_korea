@@ -37,6 +37,8 @@ sokcho_url = 'http://www.sokcho.go.kr/portal/openinfo/sokchonews/corona19news' #
 #제주
 jeju_url = 'https://jeju.go.kr/api/article.jsp?board=corona_copper'
 
+#대전
+
 
 def jeju():
     jeju_json = OrderedDict()
@@ -58,12 +60,18 @@ def jeju():
         dump = OrderedDict()
         da = data[keys[0]].split(',')
 
-        sex = da[0][-1]
-        birth = int(da[1].strip()[1:3])
-        if( birth > 20):
-            birth = 1900 + birth
+        
+        if(len(da) > 1):
+            sex = da[0][-1]
+            birth = int(da[1].strip()[1:3])
+        
+            if( birth > 20):
+                birth = 1900 + birth
+            else:
+                birth = 2000 + birth
         else:
-            birth = 2000 + birth
+            sex = da[0][-2]
+            birth = 2020 - 45
 
         date = data[keys[1]].split('.')
         day = date[1]
@@ -566,7 +574,7 @@ def main():
         json.dump(total_json, make_file, ensure_ascii=False, indent="\t")
 
 
-
+    print("파일생성 완료...")
 
 if __name__ == "__main__":
 	main()
