@@ -55,6 +55,8 @@ def jeju():
     area = 'null'
 
     cnt = len(jeju_data['articles'])
+    jeju_json["total"] = cnt
+    
 
     for data in jeju_data['articles']:
         dump = OrderedDict()
