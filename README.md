@@ -44,7 +44,7 @@ https://github.com/cherrrity/corona_in_korea/blob/master/corona_in_korea.json
    				"상세지역": "천안"
    			}, (...)]
    	}
-   
+
 
 
 (참조 사이트)  
@@ -63,6 +63,6 @@ https://github.com/cherrrity/corona_in_korea/blob/master/corona_in_korea.json
 삼척 : http://www.samcheok.go.kr/02179/02696.web  
 
 제주 : https://jeju.go.kr/api/article.jsp?board=corona_copper  
-
+대전 : https://www.daejeon.go.kr/corona19/index.do?tab=2&subTab=2  
 
 *타 지역 순차적 업데이트 중

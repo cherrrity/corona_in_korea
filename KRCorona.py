@@ -38,7 +38,58 @@ sokcho_url = 'http://www.sokcho.go.kr/portal/openinfo/sokchonews/corona19news' #
 jeju_url = 'https://jeju.go.kr/api/article.jsp?board=corona_copper'
 
 #대전
+daejeon_url = 'https://www.daejeon.go.kr/corona19/index.do?tab=2&subTab=2'
 
+def daejeon():
+    daejeon_json = OrderedDict()
+    daejeon_array = []
+
+    html = requests.get(daejeon_url).text
+    soup = BeautifulSoup(html, 'html.parser')
+    datas = soup.select('#contBox > div.blog_borad > div.story_view > div > div:nth-child(1) > div > table > tbody > tr')
+
+    cnt = len(datas)
+    daejeon_json["total"] = cnt
+
+    date = ''
+    sex = ''
+    birth = 0
+    area = ''
+
+    for data in datas:
+        dump = OrderedDict()
+        data = data.text.strip().split('\n')
+
+        #확진일
+        date = data[2].split('.')
+        month = date[0]
+        day = date[1]
+        if(len(day) < 2):
+             day = "0"+day
+        date = "2020.0"+month+"."+day
+
+        da = data[3].split('(')
+        
+        #성별
+        sex = da[0].strip()
+
+        #생년
+        birth = 2020 - int(da[1].strip()[:-2]) +5
+
+        #상세지역
+        area = data[4].strip()
+
+        dump["확진일"] = date
+        dump["성별"] = sex
+        dump["생년"] = birth
+        dump["지역"] = "대전"
+        dump["상세지역"] = area
+
+        daejeon_array.append(dump)
+
+    daejeon_json["patient"] = daejeon_array
+    print("대전 완료..")
+    return daejeon_json
 
 def jeju():
     jeju_json = OrderedDict()
@@ -554,10 +605,9 @@ def seoul():
 def main():
     total_json = OrderedDict()
     total_json["updated"] = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
-    total_json["area"] = ["seoul", "gyeonggi" , "busan", "chungnam","gyeongnam","ulsan","gangwon","jeju"]
+    total_json["area"] = ["seoul", "gyeonggi" , "busan", "chungnam","gyeongnam","ulsan","gangwon","jeju","daejeon"]
 
     #각 지역의 확진자 정보를 리턴받아 저장
-
     total_json["seoul"] = seoul() #서울
     total_json["gyeonggi"] = gyeonggi() #경기
     total_json["busan"] = busan() #부산
@@ -566,7 +616,7 @@ def main():
     total_json["ulsan"] = ulsan() #울산
     total_json["gangwon"] = gangwon() # 강원
     total_json["jeju"] = jeju() # 제주
-
+    total_json["daejeon"] = daejeon() # 대전
 
     #print test
     #print(json.dumps(total_json, ensure_ascii=False, indent="\t") )
