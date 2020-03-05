@@ -265,7 +265,7 @@ def gangwon():
 
     #확진자 수 합계
     cnt = 0
-
+    
     date = ''
     sex = ''
     birth = 0
@@ -305,37 +305,50 @@ def gangwon():
         dump["상세지역"] = "춘천"
         
         gangwon_array.append(dump)
-
+    
     #원주
     urllib3.disable_warnings()    
     html = requests.get(wonju_url,  verify=False).text
     soup = BeautifulSoup(html, 'html.parser')
-    datas = soup.select('div.sectionbox > table > tbody > tr:nth-child(n+2)')
+    datas = soup.select('.tab_obj ul li.item')
+
 
     cnt = cnt + len(datas)
     gangwon_json["total"] = cnt
 
-
-
+    
     for data in datas:
         data = data.text.strip().split('\n')
         dump = OrderedDict()
 
+        for da in data:
+            if(da == ''):
+                data.remove('')
+    
+        
         #확진일
-        date = data[1].split('.')
+        date = data[4].split('.')
         month = date[1]
         day = date[2]
         if(len(day) < 2):
              day = "0"+day
-        date = "2020.0"+month+"."+day
+        if(len(month) < 2):
+            month = "0"+month
+            
+        date = "2020."+month+"."+day
 
-        da = data[2].split(' ')
+        da = data[6].split(',')
         
         #성별
-        sex = da[2][:1]
+        sex = da[1].replace(' ','')[:1]
 
         #생년(추정치)
-        birth = 2020 - int(da[0][0:1]) + 5
+        birth = int(da[0].strip()[:2])
+        if( birth > 20):
+            birth = 1900 + birth
+        else:
+            birth = 2000 + birth
+
 
         dump["확진일"] = date
         dump["성별"] = sex
@@ -378,6 +391,8 @@ def gangwon():
 
         gangwon_array.append(dump)
        
+
+    dump = OrderedDict()
     
     #속초
     dump["확진일"] = "2020.02.22"
@@ -385,30 +400,30 @@ def gangwon():
     dump["생년"] = 2020 - 35
     dump["지역"] = "강원도"
     dump["상세지역"] = "속초"
-
-
+    
     gangwon_array.append(dump)
+
+    dump = OrderedDict()
 
     dump["확진일"] = "2020.02.22"
     dump["성별"] = "남"
     dump["생년"] = 2020 - 25
     dump["지역"] = "강원도"
     dump["상세지역"] = "속초"
-
-
+    
     gangwon_array.append(dump)
 
 
-     #속초
+    dump = OrderedDict()
+     #삼척
     dump["확진일"] = "2020.02.22"
     dump["성별"] = "남"
     dump["생년"] = 2020 - 20
     dump["지역"] = "강원도"
     dump["상세지역"] = "삼척"
-
-
+    
     gangwon_array.append(dump)
-
+    
     cnt = cnt + 3
     gangwon_json["total"] = cnt
     
@@ -448,6 +463,7 @@ def ulsan():
         date = "2020.0"+month+"."+day
 
         da = data[1].split('/')
+    
         
         #성별
         sex = da[0].strip()
@@ -732,7 +748,6 @@ def main():
     total_json["incheon"] = incheon() # 인천
     total_json["gwangju"] = gwangju() # 광주
     
-    
     #print test
     #print(json.dumps(total_json, ensure_ascii=False, indent="\t") )
 
@@ -742,6 +757,6 @@ def main():
     
 
     print("파일생성 완료...")
-
+    
 if __name__ == "__main__":
 	main()
