@@ -229,16 +229,10 @@ def jeju():
     for data in jeju_data['articles']:
         dump = OrderedDict()
         da = data[keys[0]].split(',')
-
         
         if(len(da) > 1):
             sex = da[0][-1]
-            birth = int(da[1].strip()[1:3])
-        
-            if( birth > 20):
-                birth = 1900 + birth
-            else:
-                birth = 2000 + birth
+            birth = 2020 - int(da[1].strip()[:-1])
         else:
             sex = da[0][-2]
             birth = 2020 - 45
