@@ -693,32 +693,50 @@ def seoul():
 
     html = requests.get(seoul_url).text
     soup = BeautifulSoup(html, 'html.parser')
-    datas = soup.select('#move-cont1 > div:nth-child(2) > table > tbody > tr')
+    datas = soup.select('#move-cont1 > div:nth-child(2) > table.tstyle05.tstyleP > tbody > tr')
 
     cnt = len(datas)
     seoul_json["total"] = cnt
 
-    for data in datas:
-        dump = OrderedDict()
-        for da, i in zip(data, range(0, len(data))):
+    date = ''
+    sex = ''
+    birth = 0
+    area = ''
 
-            if( i == 2):
-                date = da.text.split('.',1)
-                if(len(date[1][:-1]) < 2):
-                    day = "0"+date[1][:-1]
-                date = '2020.0' + date[0] +"."+ day
-                dump["확진일"] = date
-            elif( i == 3):
-                dump["성별"] = da.text[:1]
-                if(int(da.text[-3:-1]) > 20):
-                    dump["생년"] = int('19'+da.text[-3:-1])
-                else:
-                    dump["생년"] = int('20'+da.text[-3:-1])
-            elif( i == 4):
-                dump["지역"] = "서울"
-                dump["상세지역"] = da.text
-                if(da.text == '\xa0'):
-                    dump["상세지역"] = "null"
+    for data in datas:
+        data = data.text.strip().split('\n')
+        dump = OrderedDict()
+
+        #확진일
+        date = data[2].split('.')
+        month = date[0]
+        day = date[1]
+        if(len(day) < 2):
+            day = "0"+day
+        if(len(month) < 2):
+            month = "0"+month
+
+        date = "2020." + month +"."+ day
+
+        da = data[3].split('(')
+
+        sex = da[0]
+
+        birth = int(da[1][1:-1])
+        if( birth > 20):
+            birth = 1900 + birth
+        else:
+            birth = 2000 + birth
+
+
+        area = data[4]
+
+        dump["확진일"] = date
+        dump["성별"] = sex
+        dump["생년"] = birth
+        dump["지역"] = "서울"
+        dump["상세지역"] = area
+        
 
         seoul_array.append(dump)
 
