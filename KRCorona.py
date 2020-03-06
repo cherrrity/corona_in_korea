@@ -20,7 +20,7 @@ seoul_url = 'http://www.seoul.go.kr/coronaV/coronaStatus.do'
 #경기
 gyeonggi_url = 'https://www.gg.go.kr/bbs/boardView.do?bsIdx=464&bIdx=2296956&menuId=1535'
 #부산
-busan_url = 'http://www.busan.go.kr/corona/index.jsp'
+busan_url = 'http://www.busan.go.kr/corona19/index'
 #충남
 chungnam_url = 'http://www.chungnam.go.kr/coronaStatus.do'
 #경남
@@ -100,7 +100,8 @@ def incheon():
 
     html = requests.get(incheon_url).text
     soup = BeautifulSoup(html, 'html.parser')
-    datas = soup.select('#content > div.content-body > div > article > div > div:nth-child(5) .tbl > table > tbody > tr:nth-child(n+2)')
+    
+    datas = soup.select('div.patient-profile-wrap')
 
     cnt = len(datas)
     incheon_json["total"] = cnt
@@ -112,43 +113,37 @@ def incheon():
 
     for data in datas:
         dump = OrderedDict()
-        
-        for da, i in zip(data, range(0, len(data))):
-            da = da.text.replace(' ','')
-            if( i == 2):
-                d = da.split('/')
-                
-                #성별
-                sex = d[0]
+        data = data.text.replace('\t','').replace('\r', '').replace(' ', '').split('\n')
 
-                #생년
-                if(len(d[1]) > 2):
-                    birth = 2020 - int(d[1][0:2])
-
-                else:
-                    birth = 2020 - int(d[1][0:1])
-                    
+        da = data[4].split('/')
                 
-            elif( i == 3):
-                if(len(da.replace(' ', '')) > 3):
-                    date = da.split('(')
-                    date = date[0].split('.')
-                    month = date[1]
-                    day = date[2]
+        #성별
+        sex = da[0][1:2]
+
+        #생년
+        birth = 2020 - int(da[0][2:-1])
+
+        date = da[1].split('(')
+        date = date[0].split('.')
+        month = date[1]
+        day = date[2]
                     
-                    if(len(day) < 2):
-                        day = "0"+day
+        if(len(day) < 2):
+            day = "0"+day
                         
-                    date = "2020.0"+month+"."+day
+        date = "2020.0"+month+"."+day
 
         #상세지역
-        area = "null"
+        area = data[3]
+        if(area == ""):
+            area = 'null'
+        
 
         dump["확진일"] = date
         dump["성별"] = sex
         dump["생년"] = birth
         dump["지역"] = "인천"
-        dump["상세지역"] = "null"
+        dump["상세지역"] = area
 
         incheon_array.append(dump)
         
@@ -602,25 +597,38 @@ def busan():
 
     html = requests.get(busan_url).text
     soup = BeautifulSoup(html, 'html.parser')
-    datas = soup.select('#contents > div:nth-child(1) > div > div.list_body > ul > li:first-child')
+    datas = soup.select('#contents > div:nth-child(1) > div > div.list_body > ul')
 
     cnt = len(datas)
     busan_json["total"] = cnt
 
+    date = ''
+    sex = ''
+    birth = 0
+    area = ''
+
 
     for data in datas:
         dump = OrderedDict()
-        for da in data:
-            d = da.text.split('(',1)[1].split('/')
+        data = data.text.split('\n')
 
-            dump["확진일"] = 'null'
-            dump["성별"] = d[1].strip()
+        if(data[5] != '-'):
+            date = data[5].split('/')
+            date = "2020." + date[0] + "." + date[1]
 
-            dump["생년"] = int(d[0].strip()[:-2])
-            dump["지역"] = "부산"
-            dump["상세지역"] = d[2].strip()[:-1]
+        da = data[1].split('(')[1].split('/')
 
+        birth = int(da[0][:3])
+        sex = da[1].replace(' ', '')
+        area = da[2][:-1].replace(' ','')
 
+        dump["확진일"] = date
+        dump["성별"] = sex
+        dump["생년"] = birth
+        dump["지역"] = "부산"
+        dump["상세지역"] = area
+
+        
         busan_array.append(dump)
 
     busan_json["patient"] = busan_array
@@ -765,11 +773,13 @@ def main():
     total_json["daejeon"] = daejeon() # 대전
     total_json["incheon"] = incheon() # 인천
     total_json["gwangju"] = gwangju() # 광주
+
     
     #print test
     #print(json.dumps(total_json, ensure_ascii=False, indent="\t") )
 
     #파일 생성
+    
     with open('corona_in_korea.json','w', encoding="utf-8") as make_file:
         json.dump(total_json, make_file, ensure_ascii=False, indent="\t")
     
