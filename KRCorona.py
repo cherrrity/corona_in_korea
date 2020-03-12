@@ -318,9 +318,9 @@ def gangwon():
         dump = OrderedDict()
         
         #확진일
-        date = data[5].split('.')
-        month = date[1]
-        day = date[2]
+        date = data[-1].split('/')
+        month = date[0]
+        day = date[1]
         if(len(day) < 2):
              day = "0"+day
         if(len(month) < 2):
@@ -328,19 +328,16 @@ def gangwon():
             
         date = "2020."+month+"."+day
 
-        da = data[9].split('/')
+        da = data[1].split(' ')
+
+        d = da[1].split('/')
         
         #성별
-        sex = da[0][-1]
+        sex = d[1]
 
         #생년(추정치)
-        birth = int(da[0].strip()[:2])
-        if( birth > 20):
-            birth = 1900 + birth
-        else:
-            birth = 2000 + birth
+        birth = int(d[0].strip()[1:5])
         
-
         dump["확진일"] = date
         dump["성별"] = sex
         dump["생년"] = birth
@@ -349,7 +346,7 @@ def gangwon():
 
         gangwon_array.append(dump)
 
-    
+        
     #강릉
     urllib3.disable_warnings()    
     html = requests.get(gn_url,  verify=False).text
@@ -362,11 +359,14 @@ def gangwon():
     for data in datas:
         data = data.text.strip().split('\n')
         dump = OrderedDict()
-
+        
         #확진일
         date = data[9]
 
         da = data[1].split('/')
+
+        if( len(da) < 2):
+            continue
         
         #성별
         sex = da[1][:1]
@@ -381,7 +381,7 @@ def gangwon():
         dump["상세지역"] = "강릉"
 
         gangwon_array.append(dump)
-       
+
 
     dump = OrderedDict()
     
@@ -412,6 +412,16 @@ def gangwon():
     dump["생년"] = 2020 - 20
     dump["지역"] = "강원도"
     dump["상세지역"] = "삼척"
+    
+    gangwon_array.append(dump)
+
+    dump = OrderedDict()
+     #태백 
+    dump["확진일"] = "2020.03.04"
+    dump["성별"] = "여"
+    dump["생년"] = 2020 - 91
+    dump["지역"] = "강원도"
+    dump["상세지역"] = "태백"
     
     gangwon_array.append(dump)
     
@@ -460,7 +470,7 @@ def ulsan():
         sex = da[0].strip()
 
         #생년
-        birth = 2020 - int(da[1].strip()[:-1]) 
+        birth = 2020 - int(da[1].strip()[-3:-1]) 
 
         #상세지역
         area = da[2].strip()
@@ -502,6 +512,7 @@ def gyeongnam():
 
         if(len(data[2]) >= 32):
             del data[2]
+
 
         for da,i in zip(data, range(0, len(data))):
             if(i == 4):
@@ -553,33 +564,45 @@ def chungnam():
 
     for data in datas:
         dump = OrderedDict()
-        for da, i in zip(data, range(0, len(data))):
-            if(da != "\n"):
-                if( i == 7):
-                    date = da.text[3:-1]
-                    if(len(date) < 2):
-                        date = "0"+date
+        data = data.text.split('\n')
 
-                    date = "2020.0" + da.text[0:1] + "."+ date
+        #확진일
+        date = data[4].split(' ')
+        month = date[0][0]
+        day = date[1][:-1]
 
-                elif( i == 3):
-                    d = da.text.split(' ')
+        if(len(day) < 2):
+             day = "0"+day
+        date = "2020.0"+month+"."+day
 
-                    sex = d[1].strip()
 
-                    if( d[1].find(',') > 0):
-                        sex = sex[:-1]
+        da = data[2].split(',')
 
-                    birth = 2020 - int(d[2].strip()[:-1])
+        if(len(da) > 2):
+            #성별
+            sex = da[1][1]
 
-                    area = d[0].strip()[:-1]
+            #생년
+            birth = 2020 - int(da[2][:-1])
 
-                    dump["확진일"] = date
-                    dump["성별"] = sex
-                    dump["생년"] = birth
-                    dump["지역"] = "충청남도"
-                    dump["상세지역"] = area
+        else:
+            d = da[1].replace(' ', '')
+            #성별
+            sex = d[:1]
 
+            #생년
+            birth = 2020 - int(d[1:-1])
+
+        #상세지역
+        area = da[0][:2]
+            
+
+        dump["확진일"] = date
+        dump["성별"] = sex
+        dump["생년"] = birth
+        dump["지역"] = "충청남도"
+        dump["상세지역"] = area
+                
         chungnam_array.append(dump)
 
     chungnam_json["patient"] = chungnam_array
@@ -614,7 +637,7 @@ def busan():
 
         da = data[1].split('(')[1].split('/')
 
-        birth = int(da[0][:3])
+        birth = int(da[0][:4])
         sex = da[1].replace(' ', '')
         area = da[2][:-1].replace(' ','')
 
@@ -757,6 +780,7 @@ def main():
     total_json["area"] = ["seoul", "gyeonggi" , "busan", "chungnam","gyeongnam","ulsan","gangwon","jeju","daejeon","incheon","gwangju"]
 
     #각 지역의 확진자 정보를 리턴받아 저장
+
     total_json["seoul"] = seoul() #서울
     total_json["gyeonggi"] = gyeonggi() #경기
     total_json["busan"] = busan() #부산
@@ -769,15 +793,14 @@ def main():
     total_json["incheon"] = incheon() # 인천
     total_json["gwangju"] = gwangju() # 광주
     
+    
     #print test
     #print(json.dumps(total_json, ensure_ascii=False, indent="\t") )
 
     #파일 생성
-    
     with open('corona_in_korea.json','w', encoding="utf-8") as make_file:
         json.dump(total_json, make_file, ensure_ascii=False, indent="\t")
     
-
     print("파일생성 완료...")
     
 if __name__ == "__main__":
