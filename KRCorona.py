@@ -755,6 +755,7 @@ def gyeonggi():
     gyeonggi_json["total"] = cnt
     gyeonggi_json["data"] = temp_json
     gyeonggi_json["patient"] = gyeonggi_array
+    print("경기도 확진자 수 : " + str(cnt))
     print("경기도 완료..")
     total_count = total_count + cnt
     return gyeonggi_json
