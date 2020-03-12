@@ -1,7 +1,7 @@
 
 ## 대한민국 내 코로나-19 확진자 정보 크롤러 (json)
-
-https://github.com/cherrrity/corona_in_korea/blob/master/corona_in_korea.json  
+kaggle : https://www.kaggle.com/cherrrity/corona-in-korea  
+data_json : https://github.com/cherrrity/corona_in_korea/blob/master/corona_in_korea.json  
 
 예시)
 
