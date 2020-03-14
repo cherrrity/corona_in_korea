@@ -585,7 +585,7 @@ def chungnam():
         data = data.text.split('\n')
 
         #확진일
-        date = data[4].split(' ')
+        date = data[3].split(' ')
         month = date[0][0]
         day = date[1][:-1]
 
@@ -739,7 +739,6 @@ def gyeonggi():
                 dump["지역"] = "경기도"
                 dump["상세지역"] = area
 
-            gyeonggi_array.append(dump)
             temp_json[number] = dump
 
         page = page + 1
@@ -748,15 +747,25 @@ def gyeonggi():
         html = driver.page_source
         soup = BeautifulSoup(html, 'html.parser')
         datas = soup.select('#boardList > tbody > tr')
-        driver.implicitly_wait(3)
+        driver.implicitly_wait(5)
 
     driver.quit()
-    cnt = len(temp_json)
+
+    for data in temp_json:
+        dump = OrderedDict()
+        
+        dump["확진일"] = temp_json[data]["확진일"]
+        dump["성별"] = temp_json[data]["성별"]
+        dump["생년"] = temp_json[data]["생년"]
+        dump["지역"] = "경기도"
+        dump["상세지역"] = temp_json[data]["상세지역"]
+        
+        gyeonggi_array.append(dump)
+    
+    cnt = len(gyeonggi_array)
     gyeonggi_json["total"] = cnt
-    gyeonggi_json["data"] = temp_json
     gyeonggi_json["patient"] = gyeonggi_array
     print("경기도 확진자 수 : " + str(cnt))
-    print("경기도 완료..")
     total_count = total_count + cnt
     return gyeonggi_json
 
@@ -768,7 +777,7 @@ def seoul():
 
     html = requests.get(seoul_url).text
     soup = BeautifulSoup(html, 'html.parser')
-    datas = soup.select('#move-cont1 > div:nth-child(3) > div > div > table > tbody > tr')
+    datas = soup.select('#move-cont1 > div:nth-child(4) > div > div > table > tbody > tr')
 
     cnt  = len(datas)
 
@@ -783,49 +792,46 @@ def seoul():
 
     for data in datas:
         dump = OrderedDict()
+        data = data.text.split('\n')
 
-        for da, j in zip(data, range(0, len(datas))):
-            da = da.text
+        #확진일
+        date = data[3].split('.')
+        month = date[0]
+        day = date[1]
+        if(len(day) < 2):
+            day = "0"+day
+        if(len(month) < 2):
+            month = "0"+month
 
-            if(j == 2):
+        date = "2020." + month +"."+ day
 
-                #확진일
-                date = da.split('.')
-                month = date[0]
-                day = date[1]
-                if(len(day) < 2):
-                    day = "0"+day
-                if(len(month) < 2):
-                    month = "0"+month
 
-                date = "2020." + month +"."+ day
+        da = data[4].split("(")
 
-            elif( j == 3 ):
-                da = da.split("(")
-                sex = da[0]
+        #성별
+        sex = da[0]
+        
+        #생년
+        birth = int(da[1][1:-1])
+        if( birth > 20):
+            birth = 1900 + birth
+        else:
+            birth = 2000 + birth
+            
+        area = data[5]
 
-                birth = int(da[1][1:-1])
-                if( birth > 20):
-                    birth = 1900 + birth
-                else:
-                    birth = 2000 + birth
-
-            elif( j == 4):
-
-                area = da
-
-            dump["확진일"] = date
-            dump["성별"] = sex
-            dump["생년"] = birth
-            dump["지역"] = "서울"
-            dump["상세지역"] = area
+        dump["확진일"] = date
+        dump["성별"] = sex
+        dump["생년"] = birth
+        dump["지역"] = "서울"
+        dump["상세지역"] = area
 
 
         seoul_array.append(dump)
 
 
     seoul_json["patient"] = seoul_array
-    print("서울 완료..")
+    print("서울 확진자 수 : " + str(cnt))
     total_count = total_count + cnt
     return seoul_json
 
