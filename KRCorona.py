@@ -98,7 +98,7 @@ def gwangju():
 
 
     gwangju_json["patient"] = gwangju_array
-    print("광주광역시 완료..")
+    print("광주광역시 확진자 수 : " + str(cnt))
     total_count = total_count + cnt
     return gwangju_json
 
@@ -157,7 +157,7 @@ def incheon():
         incheon_array.append(dump)
 
     incheon_json["patient"] = incheon_array
-    print("인천 완료..")
+    print("인천 확진자 수 : " + str(cnt))
     total_count = total_count + cnt
     return incheon_json
 
@@ -211,7 +211,7 @@ def daejeon():
         daejeon_array.append(dump)
 
     daejeon_json["patient"] = daejeon_array
-    print("대전 완료..")
+    print("대전 확진자 수 : " + str(cnt))
     total_count = total_count + cnt
     return daejeon_json
 
@@ -260,7 +260,7 @@ def jeju():
         jeju_array.append(dump)
 
     jeju_json["patient"] = jeju_array
-    print("제주도 완료..")
+    print("제주도 확진자 수 : " + str(cnt))
     total_count = total_count + cnt
     return jeju_json
 
@@ -441,7 +441,7 @@ def gangwon():
     gangwon_json["total"] = cnt
 
     gangwon_json["patient"] = gangwon_array
-    print("강원도 완료..")
+    print("강원도 확진자 수 : " + str(cnt))
     total_count = total_count + cnt
     return gangwon_json
 
@@ -498,7 +498,7 @@ def ulsan():
         ulsan_array.append(dump)
 
     ulsan_json["patient"] = ulsan_array
-    print("울산 완료..")
+    print("울산 확진자 수 : " + str(cnt))
     total_count = total_count + cnt
     return ulsan_json
 
@@ -558,7 +558,7 @@ def gyeongnam():
         gyeongnam_array.append(dump)
 
     gyeongnam_json["patient"] = gyeongnam_array
-    print("경상남도 완료..")
+    print("경남 확진자 수 : " + str(cnt))
     total_count = total_count + cnt
     return gyeongnam_json
 
@@ -624,7 +624,7 @@ def chungnam():
         chungnam_array.append(dump)
 
     chungnam_json["patient"] = chungnam_array
-    print("충청남도 완료..")
+    print("충남 확진자 수 : " + str(cnt))
     total_count = total_count + cnt
     return chungnam_json
 
@@ -671,7 +671,7 @@ def busan():
         busan_array.append(dump)
 
     busan_json["patient"] = busan_array
-    print("부산 완료..")
+    print("부산 확진자 수 : " + str(cnt))
     total_count = total_count + cnt
     return busan_json
 
